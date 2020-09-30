@@ -10,10 +10,150 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./lib/htmlRenderer");
 
-
+const employeeArray = [];
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
+managerPrompt();
+function managerPrompt(){
+inquirer.prompt([
+    {
+        type: "input",
+        name: "managerName",
+        message: "What's your Manager's name?"
+    },
+    {
+        type: "input",
+        name: "managerId",
+        message: "What's your Manager's ID number?"
+    },
+    {
+        type: "input",
+        name: "managerEmail",
+        message: "What's your Manager's email address?"
+    },
+    {
+        type: "list",
+        name: "teamMember",
+        message: "Which team member(s) would you like to add?",
+        choices: ["Engineer", "Intern", "None"]
+    },
+]).then(function(response){
+    const newManager = new Manager(response.managerName, response.managerId, response.managerEmail);
+    employeeArray.push(newManager);
 
+    if(response.teamMember === "Engineer"){
+        console.log("selected an Engineer!");
+        engineerPrompt();
+    } else if(response.teamMember === "Intern"){
+        console.log("Selected an Intern!");
+        internPrompt();
+    }
+}).catch(error => {
+    if (error) throw error;
+})
+}
+
+function engineerPrompt(){
+inquirer.prompt([
+    {
+        type: "input",
+        name: "engineerName",
+        message: "What's your Engineer's name?"
+    },
+    {
+        type: "input",
+        name: "engineerId",
+        message: "What's your Engineer's ID number?"
+    },
+    {
+        type: "input",
+        name: "engineerEmail",
+        message: "What's your Engineer's email address?"
+    },
+    {
+        type: "input",
+        name: "engineerGithub",
+        message: "What's your Engineer's GitHub username?"
+    }
+
+]).then(function(response){
+    console.log(response);
+    const newEngineer = new Engineer(response.engineerName, response.engineerId, response.engineerEmail, response.engineerGithub);
+    employeeArray.push(newEngineer);
+    stopPrompt();
+}).catch(error => {
+    if (error) throw error;
+})
+}
+
+function internPrompt(){
+inquirer.prompt([
+    {
+        type: "input",
+        name: "internName",
+        message: "What's your Intern's name?"
+    },
+    {
+        type: "input",
+        name: "internId",
+        message: "What's your Intern's ID number?"
+    },
+    {
+        type: "input",
+        name: "internEmail",
+        message: "What's your Intern's email address?"
+    },
+    {
+        type: "input",
+        name: "internSchool",
+        message: "What school does your Intern attend?"
+    }
+
+]).then(function(response){
+    console.log(response);
+    const newIntern = new Engineer(response.internName, response.internId, response.internEmail, response.internSchool);
+    employeeArray.push(newIntern);
+    stopPrompt();
+}).catch(error => {
+    if (error) throw error;
+})
+}
+
+function addMemberPrompt(){
+    inquirer.prompt({
+        type: "list",
+        name: "teamMember",
+        message: "Which team member(s) would you like to add?",
+        choices: ["Engineer", "Intern"]
+    }).then(function(response){
+        if(response.choices === "Engineer"){
+            engineerPrompt();
+        } else {
+            internPrompt();
+        }
+    }).catch(function(err){
+        if(err) throw err;
+    })
+}
+
+function stopPrompt(){
+    inquirer.prompt({
+        type: "confirm",
+        name: "stop",
+        message: "Would you like to add another team member?"
+    }).then(function(result){
+        console.log(result);
+        if(result.stop === true){
+            addMemberPrompt();
+        } else {
+            console.log("We're done here pal");
+            console.log(employeeArray);
+
+        }
+    }).catch(function(err){
+        if(err) throw err;
+    })
+}
 // After the user has input all employees desired, call the `render` function (required
 // above) and pass in an array containing all employee objects; the `render` function will
 // generate and return a block of HTML including templated divs for each employee!
